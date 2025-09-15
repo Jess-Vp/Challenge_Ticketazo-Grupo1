@@ -34,10 +34,30 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('[data-cy="input-codigo-postal-lugar"]').type('5003')
     cy.get('[name="provincia"]').click()
     cy.get('[data-key="14"]').click()
-   // cy.get('[data-cy="input-localidad"]').click()
+    cy.get('input[placeholder="Seleccione una localidad"]').click()//.type('Agua de Oro').should('have.value', 'Agua de Oro');
+    cy.contains('li', 'Agua de Oro').should('be.visible').click();
+    cy.get('[data-cy="input-info"]').type('Evento para poder pagar con mercado pago iniciado')
+    cy.contains('Siguiente').click()
+    cy.get('button[aria-haspopup="listbox"]').click(); // 1. Abrir el dropdown
+    cy.contains('li', 'VIP').should('be.visible').click();
+    cy.get('[name="capacidadEntrada0"]').type(2000)
+    cy.get('[name="precioEntrada0"]').type('20000')
+    cy.contains('Siguiente').click()
+    cy.contains('Siguiente').click()
+    cy.contains('Confirmar').click()
+     //cy.on('window:alert', (text) => {expect(text).to.contains('Error al crear evento');});
+    cy.contains('Error al crear evento').should('be.visible')
+    cy.intercept('POST', '/api/backend/events/create-event').as('crearEvento')
+    cy.contains('Confirmar').click()
+    cy.wait('@crearEvento').then((intercept) => {
+    expect(intercept.response.statusCode).to.eq(400)
+    })
 
-    
 
+
+
+
+  
   })
   
 })
