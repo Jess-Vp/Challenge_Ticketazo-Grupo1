@@ -1,24 +1,17 @@
 
-describe('Logeo de Usuario de Mercado Pago', { testIsolation: false }, () => {
+describe('Logeo de Usuario de Mercado Pago', { testIsolation: true }, () => {
   //Ingresar a la pagina ticketazo
   it ('Iniciar sesion con las credenciales',()=>{
     cy.visit ('https://www.mercadopago.com.ar/home');
-    cy.get('[id=user_id]').type('TESTUSER2010833032')
-    cy.get('.andes-login-form__submit').click()
-    
+    cy.wait(1000)
+    cy.get('#user_id').type('TESTUSER2010833032')
+    cy.get('.andes-button__content',  { timeout: 1000 }).first().click()
+    cy.wait(1000)
+    cy.get('#password').type('B422F0BB#c839#4bbe#')
+    cy.get('.andes-button__content',  { timeout: 1000 }).first().click()
   })
-  //Ir a Login
-  // Ingresar usuario y contraseña de Admin
   
-
-  // Crear evento pago
-  /*it('Cargar evento', () => {
-
-  })*/
 })
-//Iniciar sesion sesion en mercado pago como tester
-// Reservar asiento en evento
-// Pagar con mercado pago
 
 
 
