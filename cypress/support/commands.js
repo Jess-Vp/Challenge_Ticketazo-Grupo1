@@ -1,4 +1,3 @@
-
 // Navegar a la pantalla de registro (usa baseUrl del config)
 Cypress.Commands.add('goToRegister', () => {
   cy.visit('https://ticketazo.com.ar/auth/registerUser');
@@ -85,4 +84,7 @@ Cypress.Commands.add('mockRegister422', (body = { errors: { email: ['Duplicado']
   }).as('reg422');
 });
 
-
+//Visit new event Meli
+Cypress.Commands.add('visitNewEvent', () => {
+  cy.visit('https://vps-3696213-x.dattaweb.com/newEvent');
+});
