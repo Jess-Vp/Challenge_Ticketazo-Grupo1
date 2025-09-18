@@ -1,17 +1,2 @@
-# Challenge Ticketazo - Grupo 1
-
-Repositorio para el proyecto grupal con Cypress del grupo 1, del curso de XAcademy QA Automation - Julio 2025.
-Integrantes:
--
--
--
--
--
--
--
--
--
-
-Herramientas utilizadas
-
-
+# ticketazo-automation
+Automatización de registro de usuario en Ticketazo con Cypress
