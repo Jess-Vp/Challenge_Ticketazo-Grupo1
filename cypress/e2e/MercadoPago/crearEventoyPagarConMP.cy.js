@@ -68,7 +68,7 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.visit('https://ticketazo.com.ar/adminTable')
     cy.get('[data-cy="btn-filtro-creado"]').click()
     cy.contains('Evento Pago para Mercado Pago').eq(0).parent('td').parent('tr')
-    // Comprar entrada
+    // Comprar entrada y hacerlo y mostrar a los chicos el tema de git
 
 
   })
