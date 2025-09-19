@@ -1,7 +1,7 @@
 describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
   //Ingresar a la pagina ticketazo
   it ('Iniciar sesion con Admin',()=>{
-/*    cy.visit('https://ticketazo.com.ar/auth/login')
+    cy.visit('https://ticketazo.com.ar/auth/login')
     cy.get('[data-cy="input-email"]').type('agusdonalisio@gmail.com')
     cy.get('[data-cy="input-password"]').type('123456789Ad.')
     cy.get('[data-cy="btn-login"]').click()
@@ -10,7 +10,7 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('[data-cy="input-titulo"]').type('Evento Pago para Mercado Pago')
 
     let date = new Date();
-    date.setDate(date.getDate() + 2) // sumar 2 dia
+    date.setDate(date.getDate() + 1) // sumar 1 dia
 
     cy.get('[data-cy="datepicker-fecha"]').as('fecha');
     cy.get('@fecha').find('[data-type="day"]').type(date.getDate()).should('be.visible');
@@ -37,9 +37,6 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('input[placeholder="Seleccione una localidad"]').click()//.type('Agua de Oro').should('have.value', 'Agua de Oro');
     cy.contains('li', 'Agua de Oro').should('be.visible').click();
     cy.get('[data-cy="input-info"]').type('Evento para poder pagar con mercado pago iniciado')
-
-    cy.wait(1000)
-
     cy.contains('Siguiente').click()
     cy.get('button[aria-haspopup="listbox"]').click(); // 1. Abrir el dropdown
     cy.contains('li', 'VIP').should('be.visible').click();
@@ -47,34 +44,20 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('[name="precioEntrada0"]').type('20000')
     cy.contains('Siguiente').click()
 
-
     // cargar imagen
-    cy.get('input[type="file"]').selectFile('./cypress/images/background.jpg', { force: true });
-    
+    cy.get('[placeholder="Cargar Imagen Evento"]').click()
+
     cy.contains('Siguiente').click()
     cy.contains('Confirmar').click()
-    
-    cy.get('button').contains('Logout').click({force: true})
-
-    cy.wait(1000)
-
-    */
-    // Aprobar eventos
-    cy.visit('https://ticketazo.com.ar/auth/login')
-    cy.get('[data-cy="input-email"]').type('admin@admin.com')
-    cy.get('[data-cy="input-password"]').type('admin')
-    cy.get('[data-cy="btn-login"]').click()
-    cy.wait(1000)
-    cy.visit('https://ticketazo.com.ar/adminTable')
-    cy.get('[data-cy="btn-filtro-creado"]').click()
-    cy.contains('Evento Pago para Mercado Pago').eq(0).parent('td').parent('tr')
-    // Comprar entrada
-
-
+     //cy.on('window:alert', (text) => {expect(text).to.contains('Error al crear evento');});
+    cy.contains('Error al crear evento').should('be.visible')
+    cy.intercept('POST', '/api/backend/events/create-event').as('crearEvento')
+    cy.contains('Confirmar').click()
+    cy.wait('@crearEvento').then((intercept) => {
+    expect(intercept.response.statusCode).to.eq(400)
+    })
   })
   
-
-
 })
 
 
