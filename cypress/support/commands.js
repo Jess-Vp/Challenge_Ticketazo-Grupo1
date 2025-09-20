@@ -88,3 +88,94 @@ Cypress.Commands.add('mockRegister422', (body = { errors: { email: ['Duplicado']
 Cypress.Commands.add('visitNewEvent', () => {
   cy.visit('https://vps-3696213-x.dattaweb.com/newEvent');
 });
+
+// --- Utils de logging ---
+const logReq = (label) => (req) => {
+  // Ayuda a debuggear en el runner
+  // eslint-disable-next-line no-console
+  console.log(`[${label}]`, req.method, req.url, req.body);
+};
+
+// --- Selectores robustos ---
+Cypress.Commands.add('getSel', (key) => {
+  const map = {
+    'input-email': ['[data-cy="input-email"]', 'input[type="email"]'],
+    'input-password': ['[data-cy="input-password"]', 'input[type="password"]', '[name="password"]'],
+    'btn-login': ['[data-cy="btn-login"]', 'button[type="submit"]'],
+    'link-register': ['[data-cy="link-register"]', 'a[href*="/auth/register"]', 'a[href*="/auth/registerUser"]'],
+    'link-forgot': ['[data-cy="link-forgot"]', 'a[href*="/auth/forgot"]'],
+  };
+
+  const candidates = map[key];
+  if (!candidates) throw new Error(`getSel: clave desconocida "${key}"`);
+
+  const tryOne = (selectors, idx = 0) => {
+    if (idx >= selectors.length) throw new Error(`No se encontró selector para "${key}"`);
+    const sel = selectors[idx];
+
+    return cy.get('body').then(($body) => {
+      if ($body.find(sel).length) return cy.get(sel);
+      // fallback especial para textos de botones/enlaces
+      if (key === 'btn-login') return cy.contains('button, [role="button"]', /login|iniciar sesión/i);
+      if (key === 'link-register') return cy.contains('a', /registrar|registrate|crear cuenta/i);
+      if (key === 'link-forgot') return cy.contains('a', /olvidaste.*contraseña|recuperar/i);
+
+      return tryOne(selectors, idx + 1);
+    });
+  };
+
+  return tryOne(candidates);
+});
+
+// --- Navegación ---
+Cypress.Commands.add('goToLogin', () => {
+  cy.visit('https://ticketazo.com.ar/auth/login', { failOnStatusCode: false });
+});
+
+// --- Form helpers ---
+Cypress.Commands.add('fillLoginForm', ({ email, password }) => {
+  cy.wait(1000);
+  cy.getSel('input-email').clear().type(email, { delay: 0 });
+  cy.getSel('input-password').clear().type(password, { delay: 0 });
+});
+
+Cypress.Commands.add('clickLogin', () => {
+  cy.getSel('btn-login').click({ force: true });
+});
+
+Cypress.Commands.add('expectLoggedIn', () => {
+  cy.url().should('not.include', '/auth/login');
+});
+
+// --- Patrón flexible del endpoint de login ---
+const LOGIN_URL_PATTERN = '**/auth/**';
+
+// --- Toggle de mocks ---
+const useMocks = () => Cypress.env('USE_MOCKS') !== false;
+
+// Respuesta 200 
+Cypress.Commands.add('mockLoginOK', (body = { token: 'fake-token' }) => {
+  cy.intercept('POST', LOGIN_URL_PATTERN, (req) => {
+    Cypress.log({ name: 'login200 match', message: req.url }); // 👈 LOG
+    req.reply({ statusCode: 200, body });
+  }).as('login200');
+});
+
+// Debe tomar el error genérico
+Cypress.Commands.add('mockLoginError', (statusCode = 401, body = {}) => {
+  if (!useMocks()) return;
+  cy.intercept('POST', LOGIN_URL_PATTERN, (req) => {
+    logReq('loginErr')(req);
+    req.reply({ statusCode, body });
+  }).as('loginErr');
+});
+
+// Capturar cualquier request para contarlas (doble submit)
+Cypress.Commands.add('captureLoginRequests', () => {
+  const requests = [];
+  cy.intercept({ method: 'POST', url: LOGIN_URL_PATTERN }, (req) => {
+    requests.push(req);
+    logReq('anyLogin')(req);
+  }).as('anyLogin');
+  cy.wrap(requests, { log: false }).as('loginRequests');
+});
