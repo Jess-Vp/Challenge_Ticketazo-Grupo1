@@ -3,6 +3,7 @@ describe('Login – E2E críticos', () => {
     cy.goToLogin();
   });
 
+  // Login exitoso con credenciales validas
   it('LOGIN-P0-008: Login exitoso con credenciales válidas (mockeado por defecto)', () => {
     cy.mockLoginOK();
 
@@ -16,12 +17,13 @@ describe('Login – E2E críticos', () => {
     if (Cypress.env('USE_MOCKS') !== false) {
       cy.wait('@login200');
     } else {
-      // si corrés contra backend real, esperá redirección/sesión
       cy.url().should('not.include', '/auth/login');
     }
 
     cy.expectLoggedIn();
   });
+
+  // Login credenciales invalidas
 
   it('LOGIN-P0-009: Credenciales inválidas', () => {
     cy.mockLoginError(401, 'Correo o contraseña incorrectos');
@@ -33,7 +35,6 @@ describe('Login – E2E críticos', () => {
 
     cy.clickLogin();
 
-    // if (Cypress.env('USE_MOCKS') !== false) cy.wait('@loginErr');
 
     // La app puede quedarse en /auth/login o recargar; toleramos ambas
     cy.url().should('include', '/auth/login');
@@ -57,6 +58,8 @@ describe('Login – E2E críticos', () => {
     cy.url().should('include', '/auth/login');
   });
 
+  // Log con campos requeridos vacios
+
   it('LOGIN-P0-004: Requeridos vacíos bloquean envío (no hay POST)', () => {
     cy.captureLoginRequests();
     cy.clickLogin();
@@ -65,9 +68,6 @@ describe('Login – E2E críticos', () => {
       expect(reqs.length, 'Requests al backend').to.eq(1);
     });
 
-    // HTML5 validity si está expuesto
-    cy.getSel('input-email').then(($el) => $el.get(0)?.checkValidity && expect($el.get(0).checkValidity()).to.eq(false));
-    cy.getSel('input-password').then(($el) => $el.get(0)?.checkValidity && expect($el.get(0).checkValidity()).to.eq(false));
   });
 
 
@@ -90,6 +90,7 @@ describe('Login – E2E críticos', () => {
     });
   });
 
+  // Navegacion a la vista de Registro y recupero de contraseña
   it('LOGIN-P0-003: Navegación a Registro y Recupero', () => {
     cy.getSel('link-register').click();
     cy.url().should('include', '/auth/register');

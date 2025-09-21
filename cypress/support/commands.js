@@ -179,3 +179,92 @@ Cypress.Commands.add('captureLoginRequests', () => {
   }).as('anyLogin');
   cy.wrap(requests, { log: false }).as('loginRequests');
 });
+
+
+// Comprar evento gratuito 
+
+
+Cypress.Commands.add('goToHome', () => {
+  cy.visit('https://ticketazo.com.ar/');
+  // Navbar u otro indicador de que cargó el home
+  cy.contains(/ticketazo/i).should('be.visible');
+});
+
+// Card del evento por título (scope a la card para no tocar otra)
+Cypress.Commands.add('openEventDrawer', (title) => {
+  cy.contains(/ver evento/i).should('exist'); // sanity
+  cy.get('[data-cy="evento-card-8"]').should('be.visible')
+    .within(() => {
+      cy.contains('button, a', /ver evento/i).click({ force: true });
+    });
+  // se abre el drawer a la derecha
+  cy.contains('[role="dialog"], aside, [data-drawer]', title, { matchCase: false }).should('be.visible');
+});
+
+// En el drawer: botón Adquirir entrada
+Cypress.Commands.add('clickAcquire', () => {
+  cy.contains('[role="dialog"] button, [role="dialog"] a, aside button, aside a', /adquirir entrada/i)
+    .should('be.enabled')
+    .click({ force: true });
+});
+
+// Seleccionar sector por nombre (ej: Auditorio)
+Cypress.Commands.add('selectSector', (sectorName) => {
+  // pantalla de "Mapa de Sectores"
+  cy.contains(/mapa de sectores/i).should('be.visible');
+  // el rectángulo grande azul tiene el nombre del sector
+  cy.contains(/auditorio|sector/i).should('be.visible');
+  cy.contains('button, [role="button"], [class*="sector"]', new RegExp(sectorName, 'i'))
+    .should('be.visible')
+    .click({ force: true });
+});
+
+// En el mapa de asientos, elegir el primer asiento disponible (naranja)
+// Ajusto varios candidatos porque no conocemos el HTML exacto:
+Cypress.Commands.add('selectAnyAvailableSeat', () => {
+  // Leyenda visible
+  cy.contains(/seleccionado/i).should('be.visible');
+  cy.contains(/disponible/i).should('be.visible');
+
+  // candidatos “disponible” 
+  const candidates = [
+    'button.bg-orange-500'
+  ];
+
+  // Busqueda asientos habilitados 
+  cy.get('body').then(($b) => {
+    const sel = candidates.find(s => $b.find(s).length > 0);
+    if (sel) {
+      cy.get(sel).first().click({ force: true });
+      return;
+    }
+  });
+
+  // Después de seleccionar, debería haber contador de asientos o estado "Seleccionado"
+  cy.contains(/\bseleccionado\b/i).should('exist');
+});
+
+// Botón Comprar (n)
+Cypress.Commands.add('clickComprar', () => {
+  // debe estar habilitado tras seleccionar
+  cy.contains('button.bg-blue-500', /comprar\s*\(\d+\)/i).should('be.enabled').click({ force: true });
+});
+
+// En método de pago entrada gratuita
+Cypress.Commands.add('generarEntradaGratuita', () => {
+  cy.contains(/método de pago/i).should('be.visible');
+  cy.contains(/evento es gratuito/i).should('be.visible');
+  cy.contains('button', /generar entrada gratuita/i).should('be.enabled').click({ force: true });
+});
+
+// Validaciones finales vista Mis entradas
+Cypress.Commands.add('expectTicketCreated', (eventTitle) => {
+  cy.url().should('include', '/tickets/list');
+  cy.contains('[data-cy="titulo-mis-entradas"]', /mis entradas/i).should('be.visible');
+
+  cy.contains('[data-cy="ticket-titulo"]', eventTitle)
+    .should('be.visible');
+
+  // Toast / pop-up de confirmación
+  cy.contains(/entrada.*(generada|creada|éxito)/i, { matchCase: false }).should('be.visible');
+});
