@@ -1,7 +1,7 @@
 describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
   //Ingresar a la pagina ticketazo
   it ('Iniciar sesion con Admin',()=>{
-/*    cy.visit('https://ticketazo.com.ar/auth/login')
+    cy.visit('https://ticketazo.com.ar/auth/login')
     cy.get('[data-cy="input-email"]').type('agusdonalisio@gmail.com')
     cy.get('[data-cy="input-password"]').type('123456789Ad.')
     cy.get('[data-cy="btn-login"]').click()
@@ -58,7 +58,7 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
 
     cy.wait(1000)
 
-    */
+    
     // Aprobar eventos
     cy.visit('https://ticketazo.com.ar/auth/login')
     cy.get('[data-cy="input-email"]').type('admin@admin.com')
@@ -67,10 +67,32 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.wait(1000)
     cy.visit('https://ticketazo.com.ar/adminTable')
     cy.get('[data-cy="btn-filtro-creado"]').click()
-    cy.contains('Evento Pago para Mercado Pago').eq(0).parent('td').parent('tr')
-    // Comprar entrada y hacerlo y mostrar a los chicos el tema de git
 
+    cy.contains('Evento Pago para Mercado Pago').eq(0).parent('td').parent('tr').as('evento')
+    //cy.get('ul li').last()
+    cy.get('@evento').find('button').click()
+    cy.get('ul li').contains('Aprobado').should('be.visible').click()
+    cy.get('[data-cy="btn-confirmar-modal"]').click()
+   
 
+    // Comprar entrada y hacerlo
+    cy.get('button').contains('Logout').click({force: true})
+    cy.wait(1000)
+    cy.visit('https://ticketazo.com.ar/auth/login')
+    cy.get('[data-cy="input-email"]').type('agusdonalisio@gmail.com')
+    cy.get('[data-cy="input-password"]').type('123456789Ad.')
+    cy.get('[data-cy="btn-login"]').click()
+    cy.wait(1000)
+    cy.get('input[type="search"]').type('Evento Pago para Mercado Pago')
+    cy.get('[data-cy="eventos-grid"]').contains('Ver evento').click().should('be.visible') 
+    cy.get('button').contains('Adquirir entrada').click()
+    cy.contains('+').click()
+    cy.get('[data-cy="btn-continuar"]').click()
+    cy.get('input[aria-label="Aceptar términos"]').check()
+    cy.get('button:contains("Pagar")').click()
+
+    // Redireccion a mercado pago
+    //cy.get('button:contains("Ingresar a mi cuenta")').click()
   })
   
 
@@ -79,15 +101,4 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
 
 
 
-//Ir a Login
 
-  // Ingresar usuario y contraseña de Admin
-  
-
-  // Crear evento pago
-  /*it('Cargar evento', () => {
-
-  })*/
-//Iniciar sesion sesion en mercado pago como tester
-// Reservar asiento en evento
-// Pagar con mercado pago
