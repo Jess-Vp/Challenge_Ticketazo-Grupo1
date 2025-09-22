@@ -5,7 +5,7 @@ Integrantes:
 - Donalisio Agustina
 - Fernandez Cecilia
 - Melina Yain Medina
-- Pelliza Maria
+- Pelliza Mario
 - Puricelli Jesica
 - Sordián Leticia Ruth
 

@@ -10,7 +10,7 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('[data-cy="input-titulo"]').type('Evento Pago para Mercado Pago')
 
     let date = new Date();
-    date.setDate(date.getDate() + 1) // sumar 1 dia
+    date.setDate(date.getDate() + 2) // sumar 2 dia
 
     cy.get('[data-cy="datepicker-fecha"]').as('fecha');
     cy.get('@fecha').find('[data-type="day"]').type(date.getDate()).should('be.visible');
@@ -37,6 +37,9 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('input[placeholder="Seleccione una localidad"]').click()//.type('Agua de Oro').should('have.value', 'Agua de Oro');
     cy.contains('li', 'Agua de Oro').should('be.visible').click();
     cy.get('[data-cy="input-info"]').type('Evento para poder pagar con mercado pago iniciado')
+
+    cy.wait(1000)
+
     cy.contains('Siguiente').click()
     cy.get('button[aria-haspopup="listbox"]').click(); // 1. Abrir el dropdown
     cy.contains('li', 'VIP').should('be.visible').click();
@@ -44,11 +47,13 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
     cy.get('[name="precioEntrada0"]').type('20000')
     cy.contains('Siguiente').click()
 
-    // cargar imagen
-    cy.get('[placeholder="Cargar Imagen Evento"]').click()
 
+    //imagen
+    
     cy.contains('Siguiente').click()
     cy.contains('Confirmar').click()
+
+
      //cy.on('window:alert', (text) => {expect(text).to.contains('Error al crear evento');});
     cy.contains('Error al crear evento').should('be.visible')
     cy.intercept('POST', '/api/backend/events/create-event').as('crearEvento')
@@ -62,15 +67,3 @@ describe('Logearse, crear un evento y pagarlo', { testIsolation: true }, () => {
 
 
 
-//Ir a Login
-
-  // Ingresar usuario y contraseña de Admin
-  
-
-  // Crear evento pago
-  /*it('Cargar evento', () => {
-
-  })*/
-//Iniciar sesion sesion en mercado pago como tester
-// Reservar asiento en evento
-// Pagar con mercado pago
